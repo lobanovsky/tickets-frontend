@@ -341,3 +341,231 @@ td a:hover {
   border-radius: 10px;
   font-weight: 500;
 }
+
+/* Action column */
+.td-action {
+  width: 1px;
+  white-space: nowrap;
+  padding-right: 12px;
+}
+
+/* Add subscription button (page header) */
+.btn-add-sub {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-add-sub:hover {
+  background: var(--accent-hover);
+}
+
+/* Inline unsubscribe button in subscription rows */
+.btn-danger-sm {
+  background: none;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-danger-sm:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+}
+
+.btn-danger-sm:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Modal */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: 12px;
+  width: 660px;
+  max-width: 96vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.modal-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.modal-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  background: #fafafa;
+}
+
+.modal-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.modal-tab:hover {
+  color: var(--text);
+}
+
+.modal-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 500;
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Performances table inside modal */
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-table td {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-table tr:last-child td {
+  border-bottom: none;
+}
+
+.modal-table tr:hover {
+  background: var(--row-hover);
+}
+
+.modal-table a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.modal-table a:hover {
+  color: var(--accent);
+}
+
+.scene-tag {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--border);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+/* Subscribe / Unsubscribe toggle buttons in modal */
+.btn-subscribe {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-subscribe:hover {
+  background: #eff6ff;
+}
+
+.btn-subscribe:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-unsubscribe {
+  background: none;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  border-radius: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-unsubscribe:hover {
+  background: #fee2e2;
+}
+
+.btn-unsubscribe:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

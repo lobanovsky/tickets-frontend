@@ -1,5 +1,12 @@
 const USER_CACHE_KEY = 'ticketsUserCache';
 
+const THEATRES = [
+  { slug: 'ramt',       name: 'РАМТ' },
+  { slug: 'nations',    name: 'Театр Наций' },
+  { slug: 'vakhtangov', name: 'Театр им. Вахтангова' },
+  { slug: 'fomenki',    name: 'Мастерская Фоменко' },
+];
+
 function esc(str) {
   if (str == null) return '';
   return String(str)
@@ -163,6 +170,9 @@ async function renderUserDetail(telegramId) {
         <button class="btn-back" onclick="history.back()">← Назад</button>
         <span class="page-title">${user ? esc(userName(user)) : 'Пользователь'}</span>
         ${user && !user.isActive ? '<span class="badge badge-inactive">Неактивен</span>' : ''}
+        <button class="btn-add-sub" onclick="openSubscribeModal('${esc(String(telegramId))}', '${esc(user ? userName(user) : '')}')">
+          + Добавить подписку
+        </button>
       </div>
 
       ${user ? `
@@ -173,23 +183,25 @@ async function renderUserDetail(telegramId) {
             <div class="user-meta">
               <span>Telegram ID: <strong>${esc(String(user.telegramId))}</strong></span>
               ${user.username ? `<span>@${esc(user.username)}</span>` : ''}
-              <span>${totalSubs} ${pluralSubs(totalSubs)}</span>
+              <span id="sub-total-chip">${totalSubs} ${pluralSubs(totalSubs)}</span>
             </div>
           </div>
         </div>
       ` : ''}
 
-      ${!groups.length
-        ? '<div class="empty">Нет подписок</div>'
-        : groups.map(g => renderTheatreGroup(g)).join('')
-      }
+      <div id="subscriptions-section">
+        ${!groups.length
+          ? '<div class="empty">Нет подписок</div>'
+          : groups.map(g => renderTheatreGroup(g, telegramId)).join('')
+        }
+      </div>
     `;
   } catch (e) {
     app.innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
   }
 }
 
-function renderTheatreGroup(group) {
+function renderTheatreGroup(group, telegramId) {
   const { theatre, subscriptions } = group;
   const hasScene = subscriptions.some(s => s.performance.scene);
   return `
@@ -207,21 +219,177 @@ function renderTheatreGroup(group) {
             ${hasScene ? '<th>Сцена</th>' : ''}
             <th>Подписан</th>
             <th>Уведомлений</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           ${subscriptions.map(s => `
-            <tr>
+            <tr data-performance-id="${esc(s.performance.id)}">
               <td><a href="${esc(s.performance.url)}" target="_blank" rel="noopener">${esc(s.performance.title)}</a></td>
               ${hasScene ? `<td class="muted">${esc(s.performance.scene)}</td>` : ''}
               <td class="muted">${formatDate(s.subscribedAt)}</td>
               <td class="muted">${s.notificationCount}</td>
+              <td class="td-action">
+                <button class="btn-danger-sm"
+                  onclick="inlineUnsubscribe(this, '${esc(String(telegramId))}', '${esc(s.performance.id)}')">
+                  Отписать
+                </button>
+              </td>
             </tr>
           `).join('')}
         </tbody>
       </table>
     </div>
   `;
+}
+
+// --- Inline unsubscribe (from detail page rows) ---
+
+async function inlineUnsubscribe(btn, telegramId, performanceId) {
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    await apiDelete('/api/subscriptions', { telegramId: Number(telegramId), performanceId });
+    const row = btn.closest('tr');
+    const section = btn.closest('.theatre-section');
+    row.remove();
+
+    // Update sub-count chip in theatre header
+    const countEl = section.querySelector('.sub-count');
+    const remaining = section.querySelectorAll('tbody tr').length;
+    if (remaining === 0) {
+      section.remove();
+    } else {
+      countEl.textContent = remaining;
+    }
+
+    // Update total chip in user card
+    const totalChip = document.getElementById('sub-total-chip');
+    if (totalChip) {
+      const total = document.querySelectorAll('#subscriptions-section tbody tr').length;
+      totalChip.textContent = `${total} ${pluralSubs(total)}`;
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Отписать';
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+// --- Subscribe modal ---
+
+let _modalHasChanges = false;
+let _modalTelegramId = null;
+
+function openSubscribeModal(telegramId, name) {
+  _modalHasChanges = false;
+  _modalTelegramId = telegramId;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal" role="dialog">
+      <div class="modal-header">
+        <span class="modal-title">Управление подписками</span>
+        <span class="modal-subtitle">${esc(name)}</span>
+        <button class="modal-close" onclick="closeSubscribeModal()">✕</button>
+      </div>
+      <div class="modal-tabs">
+        ${THEATRES.map((t, i) => `
+          <button class="modal-tab ${i === 0 ? 'active' : ''}"
+            data-slug="${esc(t.slug)}"
+            onclick="switchModalTab(this, '${esc(t.slug)}', '${esc(String(telegramId))}')">
+            ${esc(t.name)}
+          </button>
+        `).join('')}
+      </div>
+      <div class="modal-body" id="modal-body">
+        <div class="loading"><div class="spinner"></div><br>Загрузка...</div>
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeSubscribeModal(); });
+  document.body.appendChild(overlay);
+
+  loadTheatreTab(THEATRES[0].slug, telegramId);
+}
+
+function closeSubscribeModal() {
+  const overlay = document.getElementById('modal-overlay');
+  if (overlay) overlay.remove();
+  if (_modalHasChanges && _modalTelegramId) {
+    renderUserDetail(_modalTelegramId);
+  }
+}
+
+function switchModalTab(btn, slug, telegramId) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  loadTheatreTab(slug, telegramId);
+}
+
+async function loadTheatreTab(slug, telegramId) {
+  const body = document.getElementById('modal-body');
+  if (!body) return;
+  body.innerHTML = '<div class="loading"><div class="spinner"></div><br>Загрузка...</div>';
+
+  try {
+    const performances = await api(`/api/theatres/${slug}/performances?telegramId=${telegramId}`);
+    if (!performances.length) {
+      body.innerHTML = '<div class="empty">Нет спектаклей</div>';
+      return;
+    }
+    body.innerHTML = `
+      <table class="modal-table">
+        <tbody>
+          ${performances.map(p => `
+            <tr>
+              <td>
+                <a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a>
+                ${p.scene ? `<span class="scene-tag">${esc(p.scene)}</span>` : ''}
+              </td>
+              <td class="td-action">
+                <button
+                  class="${p.isSubscribed ? 'btn-unsubscribe' : 'btn-subscribe'}"
+                  data-subscribed="${p.isSubscribed}"
+                  onclick="toggleSubscription(this, '${esc(String(telegramId))}', '${esc(p.id)}')">
+                  ${p.isSubscribed ? 'Отписать' : 'Подписать'}
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) {
+    body.innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
+  }
+}
+
+async function toggleSubscription(btn, telegramId, performanceId) {
+  const isSubscribed = btn.dataset.subscribed === 'true';
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    if (isSubscribed) {
+      await apiDelete('/api/subscriptions', { telegramId: Number(telegramId), performanceId });
+      btn.textContent = 'Подписать';
+      btn.className = 'btn-subscribe';
+      btn.dataset.subscribed = 'false';
+    } else {
+      await apiPost('/api/subscriptions', { telegramId: Number(telegramId), performanceId });
+      btn.textContent = 'Отписать';
+      btn.className = 'btn-unsubscribe';
+      btn.dataset.subscribed = 'true';
+    }
+    _modalHasChanges = true;
+  } catch (e) {
+    btn.textContent = isSubscribed ? 'Отписать' : 'Подписать';
+    btn.disabled = false;
+    alert('Ошибка: ' + e.message);
+    return;
+  }
+  btn.disabled = false;
 }
 
 // --- Init ---
