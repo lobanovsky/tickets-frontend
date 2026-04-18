@@ -1,0 +1,5 @@
+private/
+.github/
+.idea/
+docker-compose.yml
+*.md

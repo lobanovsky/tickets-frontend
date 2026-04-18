@@ -1,0 +1,22 @@
+services:
+  tickets-frontend:
+    image: ${DOCKER_USERNAME}/tickets-frontend:${TAG}
+    container_name: tickets-frontend
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+      TICKETS_API_URL: ${TICKETS_API_URL}
+      ADMIN_API_KEY: ${ADMIN_API_KEY}
+    ports:
+      - "8092:80"
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gate-log.rule=Host(`gate-log.housekpr.ru`)"
+    networks:
+      - housekpr-network
+
+networks:
+  housekpr-network:
+    external: true
