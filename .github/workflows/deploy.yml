@@ -58,19 +58,19 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST_IP }}
-          username: ${{ secrets.DEPLOY_USER }}
+          username: ${{ secrets.DEPLOY_HOST_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: ".env, docker-compose.yml"
-          target: ${{ secrets.DEPLOY_DIR }}
+          target: ${{ secrets.DEPLOY_HOST_PROJECT_PATH }}
 
       - name: Docker pull and up
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.DEPLOY_HOST_IP }}
-          username: ${{ secrets.DEPLOY_USER }}
+          username: ${{ secrets.DEPLOY_HOST_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-            cd ${{ secrets.DEPLOY_DIR }}
+            cd ${{ secrets.DEPLOY_HOST_PROJECT_PATH }}
             docker compose pull
             docker compose up -d
