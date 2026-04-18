@@ -8,7 +8,7 @@ services:
       TICKETS_API_URL: ${TICKETS_API_URL}
       ADMIN_API_KEY: ${ADMIN_API_KEY}
     ports:
-      - "8092:80"
+      - "8093:80"
     env_file:
       - .env
     labels:
