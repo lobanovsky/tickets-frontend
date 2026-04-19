@@ -792,9 +792,6 @@ function openPaidSubModal(telegramId) {
 
           <label>Комментарий</label>
           <input id="ps-comment" type="text" value="Активная подписка на 6 месяцев">
-
-          <label>Активна</label>
-          <input id="ps-active" type="checkbox" checked style="width:auto">
         </div>
         <p class="form-error" id="ps-error"></p>
         <div class="form-actions">
@@ -821,7 +818,6 @@ async function submitPaidSub(telegramId) {
   const endDate = document.getElementById('ps-end').value;
   const amountPaid = Number(document.getElementById('ps-amount').value);
   const comment = document.getElementById('ps-comment').value.trim() || null;
-  const isActive = document.getElementById('ps-active').checked;
   const errEl = document.getElementById('ps-error');
   const btn = document.getElementById('ps-submit');
 
@@ -832,7 +828,7 @@ async function submitPaidSub(telegramId) {
   errEl.textContent = '';
   try {
     await apiPost(`/api/admin/users/${telegramId}/paid-subscriptions`, {
-      startDate, endDate, amountPaid, comment, isActive
+      startDate, endDate, amountPaid, comment
     });
     closePaidSubModal();
     await refreshPaidSubCard(telegramId);
