@@ -51,6 +51,32 @@ header h1 span {
   color: var(--accent);
 }
 
+nav {
+  display: flex;
+  gap: 4px;
+  margin-left: 28px;
+}
+
+.nav-link {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-link:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.nav-link.active {
+  background: var(--row-hover);
+  color: var(--accent);
+}
+
 main {
   padding: 28px 32px;
   max-width: 1200px;
@@ -568,4 +594,162 @@ td a:hover {
 .btn-unsubscribe:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+/* ============================================================
+   Performances view — Accordion
+   ============================================================ */
+
+.accordion-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.accordion-header:hover {
+  background: var(--row-hover);
+}
+
+.accordion-open .accordion-header {
+  background: #fafafa;
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 12px;
+}
+
+.accordion-title {
+  flex: 1;
+  font-weight: 500;
+}
+
+.accordion-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.accordion-title a:hover {
+  color: var(--accent);
+}
+
+.accordion-badge {
+  flex-shrink: 0;
+}
+
+/* "+ Добавить" button in accordion header */
+.btn-add-inline {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-add-inline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Accordion body */
+.accordion-body {
+  background: var(--surface);
+}
+
+/* Inline add-subscriber form */
+.add-sub-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #fafffe;
+}
+
+.add-sub-input {
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  width: 160px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.add-sub-input:focus {
+  border-color: var(--accent);
+}
+
+.add-sub-error {
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* Subscribers table inside accordion */
+.sub-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sub-table th {
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.sub-table td {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sub-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sub-table tr:hover {
+  background: var(--row-hover);
+}
+
+/* Clickable user name in performances view */
+.user-link {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.user-link:hover {
+  text-decoration: underline;
+}
+
+.empty-small {
+  padding: 16px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
 }

@@ -59,7 +59,15 @@ function getRoute() {
   if (mDetail) return { page: 'detail', telegramId: mDetail[1] };
   const mFilter = hash.match(/^users\?filter=(\w+)$/);
   if (mFilter) return { page: 'list', filter: mFilter[1] };
+  const mPerf = hash.match(/^performances(?:\?theatre=([\w]+))?$/);
+  if (mPerf) return { page: 'performances', theatre: mPerf[1] || THEATRES[0].slug };
   return { page: 'list', filter: 'all' };
+}
+
+function updateNav() {
+  const route = getRoute();
+  document.getElementById('nav-users').classList.toggle('active', route.page === 'list' || route.page === 'detail');
+  document.getElementById('nav-performances').classList.toggle('active', route.page === 'performances');
 }
 
 function setFilter(filter) {
@@ -71,9 +79,12 @@ function goToUser(telegramId) {
 }
 
 async function renderRoute() {
+  updateNav();
   const route = getRoute();
   if (route.page === 'detail') {
     await renderUserDetail(route.telegramId);
+  } else if (route.page === 'performances') {
+    await renderPerformancesView(route.theatre);
   } else {
     await renderUserList(route.filter);
   }
@@ -390,6 +401,216 @@ async function toggleSubscription(btn, telegramId, performanceId) {
     return;
   }
   btn.disabled = false;
+}
+
+// --- Performances View ---
+
+function setTheatreTab(slug) {
+  location.hash = `#/performances?theatre=${slug}`;
+}
+
+async function renderPerformancesView(activeSlug) {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="page-header">
+      <span class="page-title">Спектакли</span>
+    </div>
+    <div class="filter-tabs">
+      ${THEATRES.map(t => `
+        <button class="filter-tab ${t.slug === activeSlug ? 'active' : ''}"
+          onclick="setTheatreTab('${esc(t.slug)}')">
+          ${esc(t.name)}
+        </button>
+      `).join('')}
+    </div>
+    <div id="perf-list">
+      <div class="loading"><div class="spinner"></div><br>Загрузка...</div>
+    </div>
+  `;
+  await loadTheatreSubscriptions(activeSlug);
+}
+
+async function loadTheatreSubscriptions(slug) {
+  const container = document.getElementById('perf-list');
+  if (!container) return;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div><br>Загрузка...</div>';
+
+  try {
+    const groups = await api(`/api/admin/theatres/${slug}/subscriptions`);
+    if (!groups.length) {
+      container.innerHTML = '<div class="empty">Нет спектаклей</div>';
+      return;
+    }
+    container.innerHTML = groups.map(g => renderAccordionItem(g)).join('');
+  } catch (e) {
+    container.innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderAccordionItem(group) {
+  const { performance, subscribers } = group;
+  const count = subscribers.length;
+  const id = 'acc-' + esc(performance.id);
+  return `
+    <div class="accordion-item" id="${id}">
+      <div class="accordion-header" onclick="toggleAccordion('${id}')">
+        <span class="accordion-arrow">▶</span>
+        <span class="accordion-title">
+          <a href="${esc(performance.url)}" target="_blank" rel="noopener"
+            onclick="event.stopPropagation()">${esc(performance.title)}</a>
+          ${performance.scene ? `<span class="scene-tag">${esc(performance.scene)}</span>` : ''}
+        </span>
+        <span class="sub-count accordion-badge">${count}</span>
+        <button class="btn-add-inline"
+          onclick="event.stopPropagation(); showAddSubscriberForm('${esc(performance.id)}', '${id}')">
+          + Добавить
+        </button>
+      </div>
+      <div class="accordion-body" hidden>
+        <div class="add-sub-form" id="form-${esc(performance.id)}" hidden>
+          <input class="add-sub-input" type="text" placeholder="Telegram ID" inputmode="numeric"
+            onkeydown="if(event.key==='Enter') submitAddSubscriber(this.nextElementSibling, this.value, '${esc(performance.id)}', '${id}')">
+          <button class="btn-subscribe"
+            onclick="submitAddSubscriber(this, this.previousElementSibling.value, '${esc(performance.id)}', '${id}')">
+            Подписать
+          </button>
+          <span class="add-sub-error" id="err-${esc(performance.id)}"></span>
+        </div>
+        ${renderSubscriberTable(subscribers, performance.id)}
+      </div>
+    </div>
+  `;
+}
+
+function renderSubscriberTable(subscribers, performanceId) {
+  if (!subscribers.length) {
+    return '<div class="empty-small">Нет подписчиков</div>';
+  }
+  return `
+    <table class="sub-table">
+      <thead>
+        <tr>
+          <th>Имя</th>
+          <th>Username</th>
+          <th>Подписан</th>
+          <th>Уведомлений</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${subscribers.map(s => renderSubscriberRow(s, performanceId)).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderSubscriberRow(s, performanceId) {
+  return `
+    <tr data-telegram-id="${esc(String(s.telegramId))}">
+      <td>
+        <a class="user-link" onclick="goToUser('${esc(String(s.telegramId))}')">
+          ${esc(s.firstName)}
+        </a>
+      </td>
+      <td class="muted">${s.username ? '@' + esc(s.username) : '—'}</td>
+      <td class="muted">${formatDate(s.subscribedAt)}</td>
+      <td class="muted">${s.notificationCount}</td>
+      <td class="td-action">
+        <button class="btn-danger-sm"
+          onclick="perfUnsubscribe(this, '${esc(String(s.telegramId))}', '${esc(performanceId)}')">
+          Отписать
+        </button>
+      </td>
+    </tr>
+  `;
+}
+
+function toggleAccordion(id) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  const body = item.querySelector('.accordion-body');
+  const arrow = item.querySelector('.accordion-arrow');
+  const isOpen = !body.hidden;
+  body.hidden = isOpen;
+  arrow.textContent = isOpen ? '▶' : '▼';
+  item.classList.toggle('accordion-open', !isOpen);
+}
+
+function showAddSubscriberForm(performanceId, accordionId) {
+  const form = document.getElementById('form-' + performanceId);
+  if (!form) return;
+
+  // Open accordion if closed
+  const item = document.getElementById(accordionId);
+  const body = item && item.querySelector('.accordion-body');
+  if (body && body.hidden) toggleAccordion(accordionId);
+
+  form.hidden = !form.hidden;
+  if (!form.hidden) {
+    const input = form.querySelector('input');
+    input.value = '';
+    document.getElementById('err-' + performanceId).textContent = '';
+    input.focus();
+  }
+}
+
+async function submitAddSubscriber(btn, rawId, performanceId, accordionId) {
+  const telegramId = Number(rawId.trim());
+  const errEl = document.getElementById('err-' + performanceId);
+  if (!telegramId) {
+    errEl.textContent = 'Введите числовой Telegram ID';
+    return;
+  }
+  btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    await apiPost('/api/subscriptions', { telegramId, performanceId });
+
+    // Add row to subscriber table
+    const item = document.getElementById(accordionId);
+    const body = item.querySelector('.accordion-body');
+    let tbody = body.querySelector('tbody');
+    if (!tbody) {
+      // Replace empty-small placeholder with table
+      const placeholder = body.querySelector('.empty-small');
+      if (placeholder) placeholder.remove();
+      body.insertAdjacentHTML('beforeend', renderSubscriberTable([], performanceId));
+      tbody = body.querySelector('tbody');
+    }
+    const newSub = { telegramId, firstName: String(telegramId), username: null, subscribedAt: new Date().toISOString(), notificationCount: 0 };
+    tbody.insertAdjacentHTML('beforeend', renderSubscriberRow(newSub, performanceId));
+
+    // Update badge
+    updateAccordionBadge(item, 1);
+
+    // Hide form
+    document.getElementById('form-' + performanceId).hidden = true;
+  } catch (e) {
+    errEl.textContent = 'Ошибка: ' + e.message;
+  }
+  btn.disabled = false;
+}
+
+async function perfUnsubscribe(btn, telegramId, performanceId) {
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    await apiDelete('/api/subscriptions', { telegramId: Number(telegramId), performanceId });
+    const row = btn.closest('tr');
+    const item = btn.closest('.accordion-item');
+    row.remove();
+    updateAccordionBadge(item, -1);
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Отписать';
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+function updateAccordionBadge(item, delta) {
+  const badge = item.querySelector('.accordion-badge');
+  if (!badge) return;
+  badge.textContent = Math.max(0, Number(badge.textContent) + delta);
 }
 
 // --- Init ---
