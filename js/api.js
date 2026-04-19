@@ -10,10 +10,14 @@ async function api(path) {
 }
 
 async function apiPost(path, body) {
+  const hasBody = body != null;
   const res = await fetch(API_URL + path, {
     method: 'POST',
-    headers: { Authorization: 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    headers: {
+      Authorization: 'Bearer ' + API_KEY,
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {})
+    },
+    body: hasBody ? JSON.stringify(body) : undefined
   });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
@@ -22,6 +26,16 @@ async function apiPost(path, body) {
 async function apiDelete(path, body) {
   const res = await fetch(API_URL + path, {
     method: 'DELETE',
+    headers: { Authorization: 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+async function apiPatch(path, body) {
+  const res = await fetch(API_URL + path, {
+    method: 'PATCH',
     headers: { Authorization: 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });

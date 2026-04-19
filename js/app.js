@@ -156,7 +156,7 @@ async function renderUserList(filter) {
           ${users.map(u => `
             <tr class="clickable" onclick="goToUser('${esc(String(u.telegramId))}')">
               <td class="muted">${esc(String(u.telegramId))}</td>
-              <td>${vipStar(u.isVip)}${esc(u.firstName)}</td>
+              <td>${rubBadge(u.hasPaidSubscription)}${vipStar(u.isVip)}${esc(u.firstName)}</td>
               <td class="muted">${esc(u.lastName)}</td>
               <td class="muted">${u.username ? '@' + esc(u.username) : '—'}</td>
               <td class="muted">${formatDate(u.createdAt)}</td>
@@ -189,7 +189,10 @@ async function renderUserDetail(telegramId) {
       user = users.find(u => String(u.telegramId) === String(telegramId));
     }
 
-    const groups = await api(`/api/users/${telegramId}/subscriptions`);
+    const [groups, paidStatus] = await Promise.all([
+      api(`/api/users/${telegramId}/subscriptions`),
+      api(`/api/users/${telegramId}/paid-subscription`)
+    ]);
     const totalSubs = groups.reduce((acc, g) => acc + g.subscriptions.length, 0);
 
     app.innerHTML = `
@@ -198,7 +201,7 @@ async function renderUserDetail(telegramId) {
         <span class="page-title">${user ? esc(userName(user)) : 'Пользователь'}</span>
         ${user && !user.isActive ? '<span class="badge badge-inactive">Неактивен</span>' : ''}
         <button class="btn-add-sub" onclick="openSubscribeModal('${esc(String(telegramId))}', '${esc(user ? userName(user) : '')}')">
-          + Добавить подписку
+          + Добавить подписку на спектакль
         </button>
       </div>
 
@@ -221,6 +224,8 @@ async function renderUserDetail(telegramId) {
           </button>
         </div>
       ` : ''}
+
+      <div id="paid-sub-card">${renderPaidSubCard(paidStatus, telegramId)}</div>
 
       <div id="subscriptions-section">
         ${!groups.length
@@ -667,6 +672,169 @@ function updateAccordionBadge(item, delta) {
   const badge = item.querySelector('.accordion-badge');
   if (!badge) return;
   badge.textContent = Math.max(0, Number(badge.textContent) + delta);
+}
+
+// --- Paid subscription ---
+
+function rubBadge(hasPaid) {
+  return hasPaid ? '<span class="rub-badge" title="Платная подписка">₽</span> ' : '';
+}
+
+function formatDateShort(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  return `${d}.${m}.${y}`;
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function plusMonthsStr(months) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
+function renderPaidSubCard(status, telegramId) {
+  const tid = esc(String(telegramId));
+  if (status.hasActiveSubscription && status.subscription) {
+    const s = status.subscription;
+    const amount = s.amountPaid > 0 ? `${s.amountPaid} ₽` : 'Бесплатно';
+    return `
+      <div class="paid-sub-card paid-sub-active">
+        <div class="paid-sub-icon">₽</div>
+        <div class="paid-sub-info">
+          <div class="paid-sub-title">Платная подписка активна</div>
+          <div class="paid-sub-meta">
+            <span>${formatDateShort(s.startDate)} — ${formatDateShort(s.endDate)}</span>
+            <span>${amount}</span>
+            ${s.comment ? `<span>${esc(s.comment)}</span>` : ''}
+          </div>
+        </div>
+        <button class="btn-cancel-sub"
+          onclick="cancelPaidSub('${esc(s.id)}', '${tid}')">
+          Отменить подписку
+        </button>
+      </div>
+    `;
+  }
+  return `
+    <div class="paid-sub-card paid-sub-none">
+      <div class="paid-sub-icon paid-sub-icon-none">₽</div>
+      <div class="paid-sub-info">
+        <div class="paid-sub-title">Нет активной платной подписки</div>
+      </div>
+      <div class="paid-sub-actions">
+        <button class="btn-add-paid" onclick="openPaidSubModal('${tid}')">+ Добавить подписку</button>
+        <button class="btn-trial" onclick="addTrial('${tid}')">🎁 Пробный период</button>
+      </div>
+    </div>
+  `;
+}
+
+async function refreshPaidSubCard(telegramId) {
+  try {
+    const status = await api(`/api/users/${telegramId}/paid-subscription`);
+    const card = document.getElementById('paid-sub-card');
+    if (card) card.innerHTML = renderPaidSubCard(status, telegramId);
+  } catch (e) {
+    console.error('Ошибка обновления платной подписки:', e);
+  }
+}
+
+async function cancelPaidSub(subId, telegramId) {
+  if (!confirm('Отменить платную подписку?')) return;
+  try {
+    await apiPatch(`/api/admin/paid-subscriptions/${subId}`, { isActive: false });
+    await refreshPaidSubCard(telegramId);
+  } catch (e) {
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+async function addTrial(telegramId) {
+  try {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '...';
+    await apiPost(`/api/admin/users/${telegramId}/trial`, null);
+    await refreshPaidSubCard(telegramId);
+  } catch (e) {
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+function openPaidSubModal(telegramId) {
+  const overlay = document.createElement('div');
+  overlay.id = 'paid-modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal" role="dialog">
+      <div class="modal-header">
+        <span class="modal-title">Добавить платную подписку</span>
+        <button class="modal-close" onclick="closePaidSubModal()">✕</button>
+      </div>
+      <div class="modal-body paid-sub-form-body">
+        <div class="form-grid">
+          <label>Дата начала</label>
+          <input id="ps-start" type="date" value="${todayStr()}">
+
+          <label>Дата окончания</label>
+          <input id="ps-end" type="date" value="${plusMonthsStr(6)}">
+
+          <label>Сумма (₽)</label>
+          <input id="ps-amount" type="number" min="0" value="1000">
+
+          <label>Комментарий</label>
+          <input id="ps-comment" type="text" value="Активная подписка на 6 месяцев">
+
+          <label>Активна</label>
+          <input id="ps-active" type="checkbox" checked style="width:auto">
+        </div>
+        <p class="form-error" id="ps-error"></p>
+        <div class="form-actions">
+          <button class="btn-add-paid" id="ps-submit"
+            onclick="submitPaidSub('${esc(String(telegramId))}')">
+            Создать
+          </button>
+          <button class="btn-back" onclick="closePaidSubModal()">Отмена</button>
+        </div>
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closePaidSubModal(); });
+  document.body.appendChild(overlay);
+}
+
+function closePaidSubModal() {
+  const overlay = document.getElementById('paid-modal-overlay');
+  if (overlay) overlay.remove();
+}
+
+async function submitPaidSub(telegramId) {
+  const startDate = document.getElementById('ps-start').value;
+  const endDate = document.getElementById('ps-end').value;
+  const amountPaid = Number(document.getElementById('ps-amount').value);
+  const comment = document.getElementById('ps-comment').value.trim() || null;
+  const isActive = document.getElementById('ps-active').checked;
+  const errEl = document.getElementById('ps-error');
+  const btn = document.getElementById('ps-submit');
+
+  if (!startDate || !endDate) { errEl.textContent = 'Заполните даты'; return; }
+  if (endDate < startDate) { errEl.textContent = 'Дата окончания раньше даты начала'; return; }
+
+  btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    await apiPost(`/api/admin/users/${telegramId}/paid-subscriptions`, {
+      startDate, endDate, amountPaid, comment, isActive
+    });
+    closePaidSubModal();
+    await refreshPaidSubCard(telegramId);
+  } catch (e) {
+    errEl.textContent = 'Ошибка: ' + e.message;
+    btn.disabled = false;
+  }
 }
 
 // --- Init ---

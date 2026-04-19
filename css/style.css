@@ -368,6 +368,13 @@ td a:hover {
   font-weight: 500;
 }
 
+/* ₽ badge */
+.rub-badge {
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 13px;
+}
+
 /* VIP star */
 .vip-star {
   color: #f59e0b;
@@ -793,4 +800,192 @@ td a:hover {
   padding: 16px 20px;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* ============================================================
+   Paid subscription card
+   ============================================================ */
+
+.paid-sub-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+}
+
+.paid-sub-active {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.paid-sub-none {
+  background: var(--surface);
+}
+
+.paid-sub-icon {
+  font-size: 22px;
+  font-weight: 700;
+  color: #16a34a;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.paid-sub-icon-none {
+  color: var(--text-muted);
+  background: var(--border);
+}
+
+.paid-sub-info {
+  flex: 1;
+}
+
+.paid-sub-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.paid-sub-active .paid-sub-title {
+  color: #15803d;
+}
+
+.paid-sub-none .paid-sub-title {
+  color: var(--text-muted);
+}
+
+.paid-sub-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.paid-sub-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* "Добавить платную подписку" button */
+.btn-add-paid {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btn-add-paid:hover {
+  background: #15803d;
+}
+
+.btn-add-paid:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Trial button */
+.btn-trial {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-trial:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+.btn-trial:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Cancel subscription button */
+.btn-cancel-sub {
+  background: none;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-cancel-sub:hover {
+  background: #fee2e2;
+}
+
+/* Paid subscription modal form */
+.paid-sub-form-body {
+  padding: 20px 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.form-grid label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.form-grid input[type="date"],
+.form-grid input[type="number"],
+.form-grid input[type="text"] {
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-grid input:focus {
+  border-color: var(--accent);
+}
+
+.form-error {
+  font-size: 12px;
+  color: #dc2626;
+  min-height: 18px;
+  margin-bottom: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
 }
