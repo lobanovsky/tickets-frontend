@@ -148,6 +148,7 @@ async function renderUserList(filter) {
             <th>Имя</th>
             <th>Фамилия</th>
             <th>Username</th>
+            <th>Подписан</th>
             <th>Статус</th>
           </tr>
         </thead>
@@ -158,6 +159,7 @@ async function renderUserList(filter) {
               <td>${vipStar(u.isVip)}${esc(u.firstName)}</td>
               <td class="muted">${esc(u.lastName)}</td>
               <td class="muted">${u.username ? '@' + esc(u.username) : '—'}</td>
+              <td class="muted">${formatDate(u.createdAt)}</td>
               <td>
                 <span class="badge ${u.isActive ? 'badge-active' : 'badge-inactive'}">
                   ${u.isActive ? 'Активен' : 'Неактивен'}
