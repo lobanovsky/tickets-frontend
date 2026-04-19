@@ -452,9 +452,9 @@ function renderAccordionItem(group) {
   const count = subscribers.length;
   const id = 'acc-' + esc(performance.id);
   return `
-    <div class="accordion-item" id="${id}">
+    <div class="accordion-item accordion-open" id="${id}">
       <div class="accordion-header" onclick="toggleAccordion('${id}')">
-        <span class="accordion-arrow">▶</span>
+        <span class="accordion-arrow">▼</span>
         <span class="accordion-title">
           <a href="${esc(performance.url)}" target="_blank" rel="noopener"
             onclick="event.stopPropagation()">${esc(performance.title)}</a>
@@ -466,7 +466,7 @@ function renderAccordionItem(group) {
           + Добавить
         </button>
       </div>
-      <div class="accordion-body" hidden>
+      <div class="accordion-body">
         <div class="add-sub-form" id="form-${esc(performance.id)}" hidden>
           <input class="add-sub-input" type="text" placeholder="Telegram ID" inputmode="numeric"
             onkeydown="if(event.key==='Enter') submitAddSubscriber(this.nextElementSibling, this.value, '${esc(performance.id)}', '${id}')">
@@ -530,7 +530,7 @@ function toggleAccordion(id) {
   if (!item) return;
   const body = item.querySelector('.accordion-body');
   const arrow = item.querySelector('.accordion-arrow');
-  const isOpen = !body.hidden;
+  const isOpen = item.classList.contains('accordion-open');
   body.hidden = isOpen;
   arrow.textContent = isOpen ? '▶' : '▼';
   item.classList.toggle('accordion-open', !isOpen);
