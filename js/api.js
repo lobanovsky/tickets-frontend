@@ -28,3 +28,11 @@ async function apiDelete(path, body) {
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
 }
+
+async function apiVip(telegramId, isVip) {
+  const res = await fetch(API_URL + `/api/admin/users/${telegramId}/vip`, {
+    method: isVip ? 'POST' : 'DELETE',
+    headers: { Authorization: 'Bearer ' + API_KEY }
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+}

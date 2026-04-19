@@ -50,6 +50,20 @@ function findCachedUser(telegramId) {
   } catch (_) { return null; }
 }
 
+function updateUserCacheVip(telegramId, isVip) {
+  try {
+    const data = sessionStorage.getItem(USER_CACHE_KEY);
+    if (!data) return;
+    const users = JSON.parse(data);
+    const user = users.find(u => String(u.telegramId) === String(telegramId));
+    if (user) { user.isVip = isVip; sessionStorage.setItem(USER_CACHE_KEY, JSON.stringify(users)); }
+  } catch (_) {}
+}
+
+function vipStar(isVip) {
+  return isVip ? '<span class="vip-star" title="VIP">★</span> ' : '';
+}
+
 // --- Router ---
 
 function getRoute() {
@@ -141,7 +155,7 @@ async function renderUserList(filter) {
           ${users.map(u => `
             <tr class="clickable" onclick="goToUser('${esc(String(u.telegramId))}')">
               <td class="muted">${esc(String(u.telegramId))}</td>
-              <td>${esc(u.firstName)}</td>
+              <td>${vipStar(u.isVip)}${esc(u.firstName)}</td>
               <td class="muted">${esc(u.lastName)}</td>
               <td class="muted">${u.username ? '@' + esc(u.username) : '—'}</td>
               <td>
@@ -190,13 +204,19 @@ async function renderUserDetail(telegramId) {
         <div class="user-card">
           <div class="user-avatar">${esc(userInitial(user))}</div>
           <div class="user-info-main">
-            <div class="user-name">${esc(userName(user))}</div>
+            <div class="user-name">
+              ${user.isVip ? '<span class="vip-star vip-star-lg" title="VIP">★</span> ' : ''}${esc(userName(user))}
+            </div>
             <div class="user-meta">
               <span>Telegram ID: <strong>${esc(String(user.telegramId))}</strong></span>
               ${user.username ? `<span>@${esc(user.username)}</span>` : ''}
               <span id="sub-total-chip">${totalSubs} ${pluralSubs(totalSubs)}</span>
             </div>
           </div>
+          <button id="vip-btn" class="btn-vip ${user.isVip ? 'btn-vip-active' : ''}"
+            onclick="toggleVip('${esc(String(user.telegramId))}', ${user.isVip})">
+            ${user.isVip ? '★ Снять VIP' : '☆ Назначить VIP'}
+          </button>
         </div>
       ` : ''}
 
@@ -252,6 +272,32 @@ function renderTheatreGroup(group, telegramId) {
       </table>
     </div>
   `;
+}
+
+// --- VIP toggle ---
+
+async function toggleVip(telegramId, currentIsVip) {
+  const btn = document.getElementById('vip-btn');
+  btn.disabled = true;
+  const newIsVip = !currentIsVip;
+  try {
+    await apiVip(telegramId, newIsVip);
+    updateUserCacheVip(telegramId, newIsVip);
+    btn.textContent = newIsVip ? '★ Снять VIP' : '☆ Назначить VIP';
+    btn.className = 'btn-vip' + (newIsVip ? ' btn-vip-active' : '');
+    btn.onclick = () => toggleVip(telegramId, newIsVip);
+    const nameEl = btn.closest('.user-card').querySelector('.user-name');
+    const starEl = nameEl.querySelector('.vip-star');
+    if (newIsVip && !starEl) {
+      nameEl.insertAdjacentHTML('afterbegin', '<span class="vip-star vip-star-lg" title="VIP">★</span> ');
+    } else if (!newIsVip && starEl) {
+      starEl.nextSibling && starEl.nextSibling.nodeType === 3 && starEl.nextSibling.remove();
+      starEl.remove();
+    }
+  } catch (e) {
+    alert('Ошибка: ' + e.message);
+  }
+  btn.disabled = false;
 }
 
 // --- Inline unsubscribe (from detail page rows) ---
@@ -436,7 +482,13 @@ async function loadTheatreSubscriptions(slug) {
   container.innerHTML = '<div class="loading"><div class="spinner"></div><br>Загрузка...</div>';
 
   try {
-    const groups = await api(`/api/admin/theatres/${slug}/subscriptions`);
+    const usersPromise = sessionStorage.getItem(USER_CACHE_KEY)
+      ? Promise.resolve()
+      : api('/api/admin/users').then(cacheUsers).catch(() => {});
+    const [groups] = await Promise.all([
+      api(`/api/admin/theatres/${slug}/subscriptions`),
+      usersPromise
+    ]);
     if (!groups.length) {
       container.innerHTML = '<div class="empty">Нет спектаклей</div>';
       return;
@@ -505,10 +557,12 @@ function renderSubscriberTable(subscribers, performanceId) {
 }
 
 function renderSubscriberRow(s, performanceId) {
+  const cached = findCachedUser(s.telegramId);
+  const isVip = cached ? cached.isVip : false;
   return `
     <tr data-telegram-id="${esc(String(s.telegramId))}">
       <td>
-        <a class="user-link" onclick="goToUser('${esc(String(s.telegramId))}')">
+        ${vipStar(isVip)}<a class="user-link" onclick="goToUser('${esc(String(s.telegramId))}')">
           ${esc(s.firstName)}
         </a>
       </td>

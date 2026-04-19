@@ -239,7 +239,7 @@ td a:hover {
   padding: 20px 24px;
   margin-bottom: 24px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
 }
 
@@ -366,6 +366,47 @@ td a:hover {
   padding: 2px 8px;
   border-radius: 10px;
   font-weight: 500;
+}
+
+/* VIP star */
+.vip-star {
+  color: #f59e0b;
+  font-style: normal;
+}
+
+.vip-star-lg {
+  font-size: 18px;
+}
+
+/* VIP toggle button in user card */
+.btn-vip {
+  align-self: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.btn-vip:hover {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.btn-vip-active {
+  border-color: #f59e0b;
+  color: #b45309;
+  background: #fefce8;
+}
+
+.btn-vip:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 /* Action column */
