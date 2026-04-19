@@ -149,6 +149,7 @@ async function renderUserList(filter) {
             <th>Фамилия</th>
             <th>Username</th>
             <th>Подписан</th>
+            <th>Платная подписка</th>
             <th>Статус</th>
           </tr>
         </thead>
@@ -156,10 +157,14 @@ async function renderUserList(filter) {
           ${users.map(u => `
             <tr class="clickable" onclick="goToUser('${esc(String(u.telegramId))}')">
               <td class="muted">${esc(String(u.telegramId))}</td>
-              <td>${rubBadge(u.hasPaidSubscription)}${vipStar(u.isVip)}${esc(u.firstName)}</td>
+              <td>${vipStar(u.isVip)}${esc(u.firstName)}</td>
               <td class="muted">${esc(u.lastName)}</td>
               <td class="muted">${u.username ? '@' + esc(u.username) : '—'}</td>
               <td class="muted">${formatDate(u.createdAt)}</td>
+              <td>${u.hasPaidSubscription
+                ? '<span class="badge badge-paid">₽ Активна</span>'
+                : '<span class="muted">—</span>'
+              }</td>
               <td>
                 <span class="badge ${u.isActive ? 'badge-active' : 'badge-inactive'}">
                   ${u.isActive ? 'Активен' : 'Неактивен'}

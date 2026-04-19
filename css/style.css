@@ -231,6 +231,11 @@ td a:hover {
   color: var(--badge-inactive-text);
 }
 
+.badge-paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
 /* User info card */
 .user-card {
   background: var(--surface);
@@ -466,7 +471,8 @@ td a:hover {
 }
 
 /* Modal */
-#modal-overlay {
+#modal-overlay,
+#paid-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
