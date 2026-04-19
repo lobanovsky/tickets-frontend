@@ -5,6 +5,7 @@ const THEATRES = [
   { slug: 'nations',    name: 'Театр Наций' },
   { slug: 'vakhtangov', name: 'Театр им. Вахтангова' },
   { slug: 'fomenki',    name: 'Мастерская Фоменко' },
+  { slug: 'lensov',    name: 'Театр им. Ленсовета' },
 ];
 
 function esc(str) {
