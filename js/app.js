@@ -834,7 +834,8 @@ function openSendMessageModal(telegramId, name) {
         <textarea id="send-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
         <p class="form-error" id="send-msg-error"></p>
         <div class="form-actions">
-          <button class="btn-primary" id="send-msg-submit" onclick="submitSendMessage('${telegramId}')">Отправить</button>
+          <button class="btn-cancel" onclick="closeSendMessageModal()">Отмена</button>
+          <button class="btn-add-sub" id="send-msg-submit" onclick="submitSendMessage('${telegramId}')">Отправить</button>
         </div>
       </div>
     </div>

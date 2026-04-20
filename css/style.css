@@ -485,6 +485,30 @@ td a:hover {
   border-color: var(--accent);
 }
 
+.btn-cancel {
+  flex: 1;
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-cancel:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.form-actions .btn-add-sub {
+  flex: 1;
+  margin-left: 0;
+}
+
 /* Inline unsubscribe button in subscription rows */
 .btn-danger-sm {
   background: none;
@@ -510,7 +534,8 @@ td a:hover {
 
 /* Modal */
 #modal-overlay,
-#paid-modal-overlay {
+#paid-modal-overlay,
+.modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
