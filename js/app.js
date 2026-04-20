@@ -209,6 +209,9 @@ async function renderUserDetail(telegramId) {
         <button class="btn-add-sub" onclick="openSubscribeModal('${esc(String(telegramId))}', '${esc(user ? userName(user) : '')}')">
           + Добавить подписку на спектакль
         </button>
+        <button class="btn-send-msg" onclick="openSendMessageModal('${esc(String(telegramId))}', '${esc(user ? userName(user) : '')}')">
+          ✉ Отправить сообщение
+        </button>
       </div>
 
       ${user ? `
@@ -811,6 +814,51 @@ async function submitPaidSub(telegramId) {
     });
     closePaidSubModal();
     await refreshPaidSubCard(telegramId);
+  } catch (e) {
+    errEl.textContent = 'Ошибка: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+function openSendMessageModal(telegramId, name) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'send-msg-overlay';
+  overlay.innerHTML = `
+    <div class="modal" role="dialog">
+      <div class="modal-header">
+        <span class="modal-title">Сообщение: ${name}</span>
+        <button class="modal-close" onclick="closeSendMessageModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="send-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
+        <p class="form-error" id="send-msg-error"></p>
+        <div class="form-actions">
+          <button class="btn-primary" id="send-msg-submit" onclick="submitSendMessage('${telegramId}')">Отправить</button>
+        </div>
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeSendMessageModal(); });
+  document.body.appendChild(overlay);
+  document.getElementById('send-msg-text').focus();
+}
+
+function closeSendMessageModal() {
+  const overlay = document.getElementById('send-msg-overlay');
+  if (overlay) overlay.remove();
+}
+
+async function submitSendMessage(telegramId) {
+  const text = document.getElementById('send-msg-text').value.trim();
+  const errEl = document.getElementById('send-msg-error');
+  const btn = document.getElementById('send-msg-submit');
+  if (!text) { errEl.textContent = 'Введите текст сообщения'; return; }
+  btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    await apiPost(`/admin/messages/send/user/${telegramId}`, { message: text });
+    closeSendMessageModal();
   } catch (e) {
     errEl.textContent = 'Ошибка: ' + e.message;
     btn.disabled = false;

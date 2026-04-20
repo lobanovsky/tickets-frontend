@@ -447,6 +447,44 @@ td a:hover {
   background: var(--accent-hover);
 }
 
+.btn-send-msg {
+  background: none;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-send-msg:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.send-msg-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface);
+  resize: vertical;
+  min-height: 100px;
+  margin-bottom: 8px;
+}
+
+.send-msg-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Inline unsubscribe button in subscription rows */
 .btn-danger-sm {
   background: none;
