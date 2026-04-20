@@ -485,7 +485,7 @@ td a:hover {
 .modal {
   background: var(--surface);
   border-radius: 12px;
-  width: 660px;
+  width: 760px;
   max-width: 96vw;
   max-height: 80vh;
   display: flex;
