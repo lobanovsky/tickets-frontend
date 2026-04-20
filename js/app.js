@@ -858,7 +858,7 @@ async function submitSendMessage(telegramId) {
   btn.disabled = true;
   errEl.textContent = '';
   try {
-    await apiPost(`/admin/messages/send/user/${telegramId}`, { message: text });
+    await apiPost(`/api/admin/messages/send/user/${telegramId}`, { text });
     closeSendMessageModal();
   } catch (e) {
     errEl.textContent = 'Ошибка: ' + e.message;
