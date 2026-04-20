@@ -706,24 +706,6 @@ td a:hover {
   flex-shrink: 0;
 }
 
-/* "+ Добавить" button in accordion header */
-.btn-add-inline {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 3px 10px;
-  font-size: 12px;
-  font-family: var(--font);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  flex-shrink: 0;
-}
-
-.btn-add-inline:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 /* Accordion body */
 .accordion-body {

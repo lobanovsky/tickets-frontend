@@ -526,13 +526,9 @@ function renderAccordionItem(group) {
           ${performance.scene ? `<span class="scene-tag">${esc(performance.scene)}</span>` : ''}
         </span>
         <span class="sub-count accordion-badge">${count}</span>
-        <button class="btn-add-inline"
-          onclick="event.stopPropagation(); showAddSubscriberForm('${esc(performance.id)}', '${id}')">
-          + Добавить
-        </button>
       </div>
       <div class="accordion-body">
-        <div class="add-sub-form" id="form-${esc(performance.id)}" hidden>
+        <div class="add-sub-form" id="form-${esc(performance.id)}">
           <input class="add-sub-input" type="text" placeholder="Telegram ID" inputmode="numeric"
             onkeydown="if(event.key==='Enter') submitAddSubscriber(this.nextElementSibling, this.value, '${esc(performance.id)}', '${id}')">
           <button class="btn-subscribe"
@@ -601,24 +597,6 @@ function toggleAccordion(id) {
   body.hidden = isOpen;
   arrow.textContent = isOpen ? '▶' : '▼';
   item.classList.toggle('accordion-open', !isOpen);
-}
-
-function showAddSubscriberForm(performanceId, accordionId) {
-  const form = document.getElementById('form-' + performanceId);
-  if (!form) return;
-
-  // Open accordion if closed
-  const item = document.getElementById(accordionId);
-  const body = item && item.querySelector('.accordion-body');
-  if (body && body.hidden) toggleAccordion(accordionId);
-
-  form.hidden = !form.hidden;
-  if (!form.hidden) {
-    const input = form.querySelector('input');
-    input.value = '';
-    document.getElementById('err-' + performanceId).textContent = '';
-    input.focus();
-  }
 }
 
 async function submitAddSubscriber(btn, rawId, performanceId, accordionId) {
