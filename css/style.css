@@ -236,6 +236,16 @@ td a:hover {
   color: #15803d;
 }
 
+.badge-bot-active {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-bot-inactive {
+  background: var(--surface-alt, #f1f5f9);
+  color: var(--text-muted, #94a3b8);
+}
+
 /* User info card */
 .user-card {
   background: var(--surface);

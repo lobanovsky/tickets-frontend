@@ -65,6 +65,13 @@ function vipStar(isVip) {
   return isVip ? '<span class="vip-star" title="VIP">★</span> ' : '';
 }
 
+function renderBotLinks(botLinks) {
+  if (!botLinks || !botLinks.length) return '<span class="muted">—</span>';
+  return botLinks.map(b =>
+    `<span class="badge ${b.isSubscribed ? 'badge-bot-active' : 'badge-bot-inactive'}">${esc(b.botSlug)}</span>`
+  ).join(' ');
+}
+
 // --- Router ---
 
 function getRoute() {
@@ -152,6 +159,7 @@ async function renderUserList(filter) {
             <th>Username</th>
             <th>Подписан</th>
             <th>Платная подписка</th>
+            <th>Боты</th>
             <th>Статус</th>
           </tr>
         </thead>
@@ -167,6 +175,7 @@ async function renderUserList(filter) {
                 ? '<span class="badge badge-paid">₽ Активна</span>'
                 : '<span class="muted">—</span>'
               }</td>
+              <td>${renderBotLinks(u.botLinks)}</td>
               <td>
                 <span class="badge ${u.isActive ? 'badge-active' : 'badge-inactive'}">
                   ${u.isActive ? 'Активен' : 'Неактивен'}
