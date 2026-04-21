@@ -251,6 +251,11 @@ td a:hover {
   white-space: nowrap;
 }
 
+.col-status {
+  width: 18%;
+  white-space: nowrap;
+}
+
 /* User info card */
 .user-card {
   background: var(--surface);
