@@ -252,7 +252,7 @@ td a:hover {
 }
 
 .col-status {
-  width: 18%;
+  min-width: 120px;
   white-space: nowrap;
 }
 
