@@ -160,7 +160,7 @@ async function renderUserList(filter) {
             <th>Подписан</th>
             <th>Платная подписка</th>
             <th class="col-bots">Боты</th>
-            <th class="col-status">Статус</th>
+            <th>Статус</th>
           </tr>
         </thead>
         <tbody>
@@ -176,7 +176,7 @@ async function renderUserList(filter) {
                 : '<span class="muted">—</span>'
               }</td>
               <td class="col-bots">${renderBotLinks(u.botLinks)}</td>
-              <td class="col-status">
+              <td>
                 <span class="badge ${u.isActive ? 'badge-active' : 'badge-inactive'}">
                   ${u.isActive ? 'Активен' : 'Неактивен'}
                 </span>
