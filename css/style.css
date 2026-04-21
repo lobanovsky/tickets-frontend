@@ -246,6 +246,11 @@ td a:hover {
   color: var(--text-muted, #94a3b8);
 }
 
+.col-bots {
+  width: 18%;
+  white-space: nowrap;
+}
+
 /* User info card */
 .user-card {
   background: var(--surface);

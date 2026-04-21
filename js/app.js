@@ -159,7 +159,7 @@ async function renderUserList(filter) {
             <th>Username</th>
             <th>Подписан</th>
             <th>Платная подписка</th>
-            <th>Боты</th>
+            <th class="col-bots">Боты</th>
             <th>Статус</th>
           </tr>
         </thead>
@@ -175,7 +175,7 @@ async function renderUserList(filter) {
                 ? '<span class="badge badge-paid">₽ Активна</span>'
                 : '<span class="muted">—</span>'
               }</td>
-              <td>${renderBotLinks(u.botLinks)}</td>
+              <td class="col-bots">${renderBotLinks(u.botLinks)}</td>
               <td>
                 <span class="badge ${u.isActive ? 'badge-active' : 'badge-inactive'}">
                   ${u.isActive ? 'Активен' : 'Неактивен'}
