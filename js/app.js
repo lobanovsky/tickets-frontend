@@ -115,6 +115,7 @@ async function renderUserList(filter) {
     <div class="page-header">
       <span class="page-title">Подписчики</span>
       <span class="count-chip" id="user-count"></span>
+      <button class="btn-send-msg" onclick="openSendAllMessageModal()">✉ Отправить всем</button>
     </div>
     <div class="filter-tabs">
       <button class="filter-tab ${filter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Все</button>
@@ -860,6 +861,52 @@ async function submitSendMessage(telegramId) {
   try {
     await apiPost(`/api/admin/messages/send/user/${telegramId}`, { text });
     closeSendMessageModal();
+  } catch (e) {
+    errEl.textContent = 'Ошибка: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+function openSendAllMessageModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'send-all-msg-overlay';
+  overlay.innerHTML = `
+    <div class="modal" role="dialog">
+      <div class="modal-header">
+        <span class="modal-title">Отправить всем подписчикам</span>
+        <button class="modal-close" onclick="closeSendAllMessageModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="send-all-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
+        <p class="form-error" id="send-all-msg-error"></p>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="closeSendAllMessageModal()">Отмена</button>
+          <button class="btn-add-sub" id="send-all-msg-submit" onclick="submitSendAllMessage()">Отправить</button>
+        </div>
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeSendAllMessageModal(); });
+  document.body.appendChild(overlay);
+  document.getElementById('send-all-msg-text').focus();
+}
+
+function closeSendAllMessageModal() {
+  const overlay = document.getElementById('send-all-msg-overlay');
+  if (overlay) overlay.remove();
+}
+
+async function submitSendAllMessage() {
+  const text = document.getElementById('send-all-msg-text').value.trim();
+  const errEl = document.getElementById('send-all-msg-error');
+  const btn = document.getElementById('send-all-msg-submit');
+  if (!text) { errEl.textContent = 'Введите текст сообщения'; return; }
+  btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    await apiPost('/api/admin/messages/send/all', { text });
+    closeSendAllMessageModal();
   } catch (e) {
     errEl.textContent = 'Ошибка: ' + e.message;
     btn.disabled = false;
