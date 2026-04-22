@@ -899,7 +899,7 @@ function openSendAllMessageModal() {
         <select id="send-all-msg-parse-mode" class="send-msg-parse-mode">
           <option value="">Без форматирования</option>
           <option value="HTML">HTML</option>
-          <option value="MarkdownV2">MarkdownV2</option>
+          <option value="Markdown">Markdown</option>
         </select>
         <p class="form-error" id="send-all-msg-error"></p>
         <div class="form-actions">
