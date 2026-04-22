@@ -842,6 +842,11 @@ function openSendMessageModal(telegramId, name) {
       </div>
       <div class="modal-body">
         <textarea id="send-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
+        <select id="send-msg-parse-mode" class="send-msg-parse-mode">
+          <option value="">Без форматирования</option>
+          <option value="HTML">HTML</option>
+          <option value="MarkdownV2">MarkdownV2</option>
+        </select>
         <p class="form-error" id="send-msg-error"></p>
         <div class="form-actions">
           <button class="btn-cancel" onclick="closeSendMessageModal()">Отмена</button>
@@ -862,13 +867,16 @@ function closeSendMessageModal() {
 
 async function submitSendMessage(telegramId) {
   const text = document.getElementById('send-msg-text').value.trim();
+  const parseMode = document.getElementById('send-msg-parse-mode').value;
   const errEl = document.getElementById('send-msg-error');
   const btn = document.getElementById('send-msg-submit');
   if (!text) { errEl.textContent = 'Введите текст сообщения'; return; }
   btn.disabled = true;
   errEl.textContent = '';
+  const body = { text };
+  if (parseMode) body.parseMode = parseMode;
   try {
-    await apiPost(`/api/admin/messages/send/user/${telegramId}`, { text });
+    await apiPost(`/api/admin/messages/send/user/${telegramId}`, body);
     closeSendMessageModal();
   } catch (e) {
     errEl.textContent = 'Ошибка: ' + e.message;
@@ -888,6 +896,11 @@ function openSendAllMessageModal() {
       </div>
       <div class="modal-body">
         <textarea id="send-all-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
+        <select id="send-all-msg-parse-mode" class="send-msg-parse-mode">
+          <option value="">Без форматирования</option>
+          <option value="HTML">HTML</option>
+          <option value="MarkdownV2">MarkdownV2</option>
+        </select>
         <p class="form-error" id="send-all-msg-error"></p>
         <div class="form-actions">
           <button class="btn-cancel" onclick="closeSendAllMessageModal()">Отмена</button>
@@ -908,13 +921,16 @@ function closeSendAllMessageModal() {
 
 async function submitSendAllMessage() {
   const text = document.getElementById('send-all-msg-text').value.trim();
+  const parseMode = document.getElementById('send-all-msg-parse-mode').value;
   const errEl = document.getElementById('send-all-msg-error');
   const btn = document.getElementById('send-all-msg-submit');
   if (!text) { errEl.textContent = 'Введите текст сообщения'; return; }
   btn.disabled = true;
   errEl.textContent = '';
+  const body = { text };
+  if (parseMode) body.parseMode = parseMode;
   try {
-    await apiPost('/api/admin/messages/send/all', { text });
+    await apiPost('/api/admin/messages/send/all', body);
     closeSendAllMessageModal();
   } catch (e) {
     errEl.textContent = 'Ошибка: ' + e.message;
