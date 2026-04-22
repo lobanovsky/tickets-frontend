@@ -844,7 +844,7 @@ function openSendMessageModal(telegramId, name) {
         <textarea id="send-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
         <select id="send-msg-parse-mode" class="send-msg-parse-mode">
           <option value="">Без форматирования</option>
-          <option value="HTML">HTML</option>
+          <option value="HTML" selected>HTML</option>
           <option value="Markdown">Markdown</option>
         </select>
         <p class="form-error" id="send-msg-error"></p>
@@ -898,7 +898,7 @@ function openSendAllMessageModal() {
         <textarea id="send-all-msg-text" class="send-msg-textarea" placeholder="Текст сообщения..." rows="5"></textarea>
         <select id="send-all-msg-parse-mode" class="send-msg-parse-mode">
           <option value="">Без форматирования</option>
-          <option value="HTML">HTML</option>
+          <option value="HTML" selected>HTML</option>
           <option value="Markdown">Markdown</option>
         </select>
         <p class="form-error" id="send-all-msg-error"></p>
