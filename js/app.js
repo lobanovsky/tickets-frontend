@@ -129,6 +129,7 @@ async function renderUserList(filter) {
       <button class="filter-tab ${filter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Все</button>
       <button class="filter-tab ${filter === 'withSubs' ? 'active' : ''}" onclick="setFilter('withSubs')">С подписками</button>
       <button class="filter-tab ${filter === 'noSubs' ? 'active' : ''}" onclick="setFilter('noSubs')">Без подписок</button>
+      <button class="filter-tab ${filter === 'withPaidSubs' ? 'active' : ''}" onclick="setFilter('withPaidSubs')">Платная подписка</button>
     </div>
     <div class="table-wrap">
       <div class="loading"><div class="spinner"></div><br>Загрузка...</div>
@@ -138,6 +139,7 @@ async function renderUserList(filter) {
   let qs = '';
   if (filter === 'withSubs') qs = '?hasSubscriptions=true';
   if (filter === 'noSubs') qs = '?hasSubscriptions=false';
+  if (filter === 'withPaidSubs') qs = '?hasPaidSubscription=true';
 
   try {
     const users = await api('/api/admin/users' + qs);
