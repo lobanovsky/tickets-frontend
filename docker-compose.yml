@@ -11,12 +11,12 @@ services:
       - "8093:80"
     env_file:
       - .env
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.tickets-admin.rule=Host(`tickets-admin.housekpr.ru`)"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.tickets-admin.rule=Host(`tickets-admin.housekpr.ru`)"
     networks:
-      - housekpr-network
+      - tickets-network
 
 networks:
-  housekpr-network:
+  tickets-network:
     external: true
