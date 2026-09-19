@@ -1,0 +1,9 @@
+:3000 {
+    handle /api/* {
+        reverse_proxy 127.0.0.1:8080
+    }
+    handle {
+        root * .
+        file_server
+    }
+}

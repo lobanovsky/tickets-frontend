@@ -42,6 +42,7 @@ function pluralSubs(n) {
 // --- Session cache ---
 
 function cacheUsers(users) {
+  if (!authenticated) return;
   try { sessionStorage.setItem(USER_CACHE_KEY, JSON.stringify(users)); } catch (_) {}
 }
 
@@ -103,6 +104,7 @@ function goToUser(telegramId) {
 }
 
 async function renderRoute() {
+  if (!authenticated) return;
   updateNav();
   const route = getRoute();
   if (route.page === 'detail') {
@@ -191,6 +193,7 @@ async function renderUserList(filter) {
       </table>
     `;
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     app.querySelector('.table-wrap').innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
   }
 }
@@ -258,6 +261,7 @@ async function renderUserDetail(telegramId) {
       </div>
     `;
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     app.innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
   }
 }
@@ -325,6 +329,7 @@ async function toggleVip(telegramId, currentIsVip) {
       starEl.remove();
     }
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     alert('Ошибка: ' + e.message);
   }
   btn.disabled = false;
@@ -357,6 +362,7 @@ async function inlineUnsubscribe(btn, telegramId, performanceId) {
       totalChip.textContent = `${total} ${pluralSubs(total)}`;
     }
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     btn.disabled = false;
     btn.textContent = 'Отписать';
     alert('Ошибка: ' + e.message);
@@ -449,6 +455,7 @@ async function loadTheatreTab(slug, telegramId) {
       </table>
     `;
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     body.innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
   }
 }
@@ -471,6 +478,7 @@ async function toggleSubscription(btn, telegramId, performanceId) {
     }
     _modalHasChanges = true;
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     btn.textContent = isSubscribed ? 'Отписать' : 'Подписать';
     btn.disabled = false;
     alert('Ошибка: ' + e.message);
@@ -525,6 +533,7 @@ async function loadTheatreSubscriptions(slug) {
     }
     container.innerHTML = groups.map(g => renderAccordionItem(g)).join('');
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     container.innerHTML = `<div class="error">Ошибка загрузки: ${esc(e.message)}</div>`;
   }
 }
@@ -648,6 +657,7 @@ async function submitAddSubscriber(btn, rawId, performanceId, accordionId) {
     // Hide form
     document.getElementById('form-' + performanceId).hidden = true;
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     errEl.textContent = 'Ошибка: ' + e.message;
   }
   btn.disabled = false;
@@ -663,6 +673,7 @@ async function perfUnsubscribe(btn, telegramId, performanceId) {
     row.remove();
     updateAccordionBadge(item, -1);
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     btn.disabled = false;
     btn.textContent = 'Отписать';
     alert('Ошибка: ' + e.message);
@@ -740,6 +751,7 @@ async function refreshPaidSubCard(telegramId) {
     const card = document.getElementById('paid-sub-card');
     if (card) card.innerHTML = renderPaidSubCard(status, telegramId);
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     console.error('Ошибка обновления платной подписки:', e);
   }
 }
@@ -750,6 +762,7 @@ async function cancelPaidSub(subId, telegramId) {
     await apiPatch(`/api/admin/paid-subscriptions/${subId}`, { isActive: false });
     await refreshPaidSubCard(telegramId);
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     alert('Ошибка: ' + e.message);
   }
 }
@@ -762,6 +775,7 @@ async function addTrial(telegramId) {
     await apiPost(`/api/admin/users/${telegramId}/trial`, null);
     await refreshPaidSubCard(telegramId);
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     alert('Ошибка: ' + e.message);
   }
 }
@@ -829,6 +843,7 @@ async function submitPaidSub(telegramId) {
     closePaidSubModal();
     await refreshPaidSubCard(telegramId);
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     errEl.textContent = 'Ошибка: ' + e.message;
     btn.disabled = false;
   }
@@ -883,6 +898,7 @@ async function submitSendMessage(telegramId) {
     await apiPost(`/api/admin/messages/send/user/${telegramId}`, body);
     closeSendMessageModal();
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     errEl.textContent = 'Ошибка: ' + e.message;
     btn.disabled = false;
   }
@@ -937,10 +953,11 @@ async function submitSendAllMessage() {
     await apiPost('/api/admin/messages/send/all', body);
     closeSendAllMessageModal();
   } catch (e) {
+    if (e instanceof SessionExpiredError) return;
     errEl.textContent = 'Ошибка: ' + e.message;
     btn.disabled = false;
   }
 }
 
 // --- Init ---
-renderRoute();
+initializeAuth();

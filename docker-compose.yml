@@ -5,10 +5,6 @@ services:
     restart: always
     environment:
       TZ: Europe/Moscow
-      TICKETS_API_URL: ""
-      ADMIN_API_KEY: ${ADMIN_API_KEY}
-    env_file:
-      - .env
     labels:
       traefik.enable: "true"
       traefik.docker.network: housekpr-network

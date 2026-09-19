@@ -1,6 +1,7 @@
 :root {
   --bg: #f5f5f5;
   --surface: #ffffff;
+  --surface-alt: #f1f5f9;
   --border: #e0e0e0;
   --text: #1a1a1a;
   --text-muted: #666;
@@ -23,7 +24,7 @@
 }
 
 body {
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 14px;
@@ -133,7 +134,7 @@ main {
   border: none;
   background: none;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   color: var(--text-muted);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -242,8 +243,8 @@ td a:hover {
 }
 
 .badge-bot-inactive {
-  background: var(--surface-alt, #f1f5f9);
-  color: var(--text-muted, #94a3b8);
+  background: var(--surface-alt);
+  color: #94a3b8;
 }
 
 /* User info card */
@@ -338,7 +339,6 @@ td a:hover {
 
 /* Subscriptions section title */
 .section-title {
-  font-size: 15px;
   font-weight: 600;
   margin-bottom: 12px;
   color: var(--text-muted);
@@ -408,7 +408,7 @@ td a:hover {
   border-radius: 6px;
   padding: 6px 14px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   color: var(--text-muted);
   cursor: pointer;
   white-space: nowrap;
@@ -447,7 +447,7 @@ td a:hover {
   border-radius: 6px;
   padding: 7px 14px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s;
@@ -464,7 +464,7 @@ td a:hover {
   border-radius: 6px;
   padding: 7px 14px;
   font-size: 14px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -481,7 +481,7 @@ td a:hover {
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   font-size: 14px;
   color: var(--text);
   background: var(--surface);
@@ -521,7 +521,7 @@ td a:hover {
   border-radius: 6px;
   padding: 9px 14px;
   font-size: 14px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   font-weight: 500;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
@@ -545,7 +545,7 @@ td a:hover {
   border-radius: 5px;
   padding: 3px 10px;
   font-size: 12px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
@@ -635,7 +635,7 @@ td a:hover {
   border-bottom: 2px solid transparent;
   padding: 10px 14px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   color: var(--text-muted);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -704,7 +704,7 @@ td a:hover {
   border-radius: 5px;
   padding: 4px 12px;
   font-size: 12px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   cursor: pointer;
   transition: background 0.15s;
   white-space: nowrap;
@@ -726,7 +726,7 @@ td a:hover {
   border-radius: 5px;
   padding: 4px 12px;
   font-size: 12px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   cursor: pointer;
   transition: background 0.15s;
   white-space: nowrap;
@@ -818,7 +818,7 @@ td a:hover {
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   width: 160px;
   outline: none;
   transition: border-color 0.15s;
@@ -962,7 +962,7 @@ td a:hover {
   border-radius: 6px;
   padding: 7px 14px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -985,7 +985,7 @@ td a:hover {
   border-radius: 6px;
   padding: 6px 14px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   color: var(--text-muted);
   cursor: pointer;
   white-space: nowrap;
@@ -1010,7 +1010,7 @@ td a:hover {
   border-radius: 6px;
   padding: 6px 14px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.15s;
@@ -1047,7 +1047,7 @@ td a:hover {
   border-radius: 5px;
   padding: 6px 10px;
   font-size: 13px;
-  font-family: var(--font);
+  font-family: var(--font), sans-serif;
   width: 100%;
   outline: none;
   transition: border-color 0.15s;
@@ -1068,3 +1068,9 @@ td a:hover {
   display: flex;
   gap: 8px;
 }
+
+[hidden] { display: none !important; }
+.login-form { max-width: 360px; margin: 64px auto; display: grid; gap: 16px; }
+.login-form label { display: grid; gap: 8px; }
+.login-form input, .login-form button { padding: 12px; font: inherit; }
+#login-error { color: #dc2626; min-height: 1.5em; }

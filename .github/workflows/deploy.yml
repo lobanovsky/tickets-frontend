@@ -16,6 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test
+        run: node --test tests/*.test.cjs
+
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
@@ -51,7 +58,6 @@ jobs:
         run: |
           echo "TAG=${{ env.SHORT_SHA }}" > .env
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env
-          echo "ADMIN_API_KEY=${{ secrets.ADMIN_API_KEY }}" >> .env
 
       - name: Check deployment networks
         uses: appleboy/ssh-action@v1.2.2

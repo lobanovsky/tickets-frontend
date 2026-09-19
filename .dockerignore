@@ -7,3 +7,8 @@ docker-compose.yml
 .git/
 .env
 .env.*
+auth.env
+auth.env.*
+
+tests/
+dev/

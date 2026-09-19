@@ -1,3 +1,5 @@
 private/
 .env
 .idea/
+auth.env
+auth.env.*

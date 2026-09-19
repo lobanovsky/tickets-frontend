@@ -14,12 +14,14 @@
 Бэкенд должен быть запущен на `http://localhost:8080`.
 
 ```bash
-python3 -m http.server 3000
+caddy run --config dev/Caddyfile
 ```
 
 Открыть: http://localhost:3000
 
-По умолчанию используется API-ключ `admin-secret`. Чтобы изменить — отредактировать `js/api.js`.
+Вход — по логину и паролю, настроенным на бэкенде. Для локального запуска задайте
+`ADMIN_ORIGIN=http://localhost:3000` и `ADMIN_COOKIE_SECURE=false` на бэкенде.
+В production cookie требует HTTPS. Сессия действует 12 часов; кнопка «Выйти» удаляет её.
 
 ## Структура
 
@@ -29,7 +31,7 @@ tickets-frontend/
 ├── css/
 │   └── style.css
 ├── js/
-│   ├── api.js      # HTTP-клиент, API_URL, API_KEY
+│   ├── api.js      # HTTP-клиент с cookie-сессией
 │   └── app.js      # Роутер, страницы, рендеринг
 ├── docker/
 │   ├── nginx.conf
@@ -39,14 +41,11 @@ tickets-frontend/
 
 ## Docker
 
-Образ собирается на базе `nginx:alpine`. При старте контейнера `entrypoint.sh` подставляет адрес и ключ API через переменные окружения:
+Образ собирается на базе `nginx:alpine`. Браузер обращается к API на текущем домене; Nginx проксирует запросы в Docker-сети:
 
 ```bash
 docker build -t tickets-frontend .
-docker run -p 8092:80 \
-  -e TICKETS_API_URL=http://api-host:8080 \
-  -e ADMIN_API_KEY=admin-secret \
-  tickets-frontend
+docker run --network tickets-network -p 3000:80 tickets-frontend
 ```
 
 ### docker-compose
@@ -55,7 +54,6 @@ docker run -p 8092:80 \
 # Создать .env
 echo "TAG=latest" > .env
 echo "DOCKER_USERNAME=your_username" >> .env
-echo "ADMIN_API_KEY=admin-secret" >> .env
 
 docker compose up -d
 ```
@@ -65,12 +63,15 @@ docker compose up -d
 Traefik выпускает сертификат через resolver `letsEncrypt` и перенаправляет HTTP на HTTPS.
 Порт 8093 на хосте не публикуется. Cloudflare настроен в режиме DNS only.
 
-В Compose `TICKETS_API_URL` задан пустой строкой: браузер обращается к API на текущем
-домене, а Nginx проксирует `/api/` на `tickets-backend:8080` с сохранением пути и
-Authorization. Отдельный публичный адрес API для фронтенда не требуется.
-Если переменная не задана при запуске образа напрямую, используется `http://localhost:8080`.
-Для запуска образа необходим доступ к `tickets-backend` в Docker-сети;
-в примере `docker run` выше добавьте `--network tickets-network`.
+Nginx проксирует `/api/` на `tickets-backend:8080` с сохранением пути и cookie.
+Секретов в образе и JavaScript нет. До проверки сессии данные не загружаются;
+при выходе или истечении сессии кеш и административный интерфейс очищаются.
+
+## Проверки
+
+```bash
+node --test tests/*.test.cjs
+```
 
 ## CI/CD
 
@@ -90,4 +91,3 @@ Authorization. Отдельный публичный адрес API для фр�
 | `DEPLOY_USER` | SSH-пользователь |
 | `DEPLOY_SSH_KEY` | Приватный SSH-ключ |
 | `DEPLOY_DIR` | Путь на сервере для docker-compose |
-| `ADMIN_API_KEY` | Ключ администратора |
