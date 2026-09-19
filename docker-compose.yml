@@ -5,18 +5,25 @@ services:
     restart: always
     environment:
       TZ: Europe/Moscow
-      TICKETS_API_URL: ${TICKETS_API_URL}
+      TICKETS_API_URL: ""
       ADMIN_API_KEY: ${ADMIN_API_KEY}
-    ports:
-      - "8093:80"
     env_file:
       - .env
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.tickets-admin.rule=Host(`tickets-admin.housekpr.ru`)"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: housekpr-network
+      traefik.http.routers.tickets-tix.rule: Host(`tix.lobanovsky.ru`)
+      traefik.http.routers.tickets-tix.entrypoints: https
+      traefik.http.routers.tickets-tix.tls.certresolver: letsEncrypt
+      traefik.http.routers.tickets-tix.service: tickets-tix
+      traefik.http.services.tickets-tix.loadbalancer.server.port: "80"
     networks:
       - tickets-network
+      - proxy
 
 networks:
+  proxy:
+    external: true
+    name: housekpr-network
   tickets-network:
     external: true

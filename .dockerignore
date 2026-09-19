@@ -3,3 +3,7 @@ private/
 .idea/
 docker-compose.yml
 *.md
+
+.git/
+.env
+.env.*

@@ -55,13 +55,22 @@ docker run -p 8092:80 \
 # Создать .env
 echo "TAG=latest" > .env
 echo "DOCKER_USERNAME=your_username" >> .env
-echo "TICKETS_API_URL=http://api-host:8080" >> .env
 echo "ADMIN_API_KEY=admin-secret" >> .env
 
 docker compose up -d
 ```
 
-Приложение будет доступно на порту `8092`.
+Продакшен-адрес: https://tix.lobanovsky.ru. Compose подключает фронтенд к существующим
+внешним сетям `housekpr-network` (Traefik) и `tickets-network` (бэкенд).
+Traefik выпускает сертификат через resolver `letsEncrypt` и перенаправляет HTTP на HTTPS.
+Порт 8093 на хосте не публикуется. Cloudflare настроен в режиме DNS only.
+
+В Compose `TICKETS_API_URL` задан пустой строкой: браузер обращается к API на текущем
+домене, а Nginx проксирует `/api/` на `tickets-backend:8080` с сохранением пути и
+Authorization. Отдельный публичный адрес API для фронтенда не требуется.
+Если переменная не задана при запуске образа напрямую, используется `http://localhost:8080`.
+Для запуска образа необходим доступ к `tickets-backend` в Docker-сети;
+в примере `docker run` выше добавьте `--network tickets-network`.
 
 ## CI/CD
 
@@ -81,5 +90,4 @@ docker compose up -d
 | `DEPLOY_USER` | SSH-пользователь |
 | `DEPLOY_SSH_KEY` | Приватный SSH-ключ |
 | `DEPLOY_DIR` | Путь на сервере для docker-compose |
-| `TICKETS_API_URL` | URL бэкенда (tickets-backend) |
 | `ADMIN_API_KEY` | Ключ администратора |
