@@ -1074,3 +1074,289 @@ td a:hover {
 .login-form label { display: grid; gap: 8px; }
 .login-form input, .login-form button { padding: 12px; font: inherit; }
 #login-error { color: #dc2626; min-height: 1.5em; }
+
+/* ============================================================
+   Mobile layout
+   ============================================================ */
+
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  header {
+    height: auto;
+    min-height: 52px;
+    padding: 8px max(16px, env(safe-area-inset-left)) 8px
+      max(16px, env(safe-area-inset-right));
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  header h1 {
+    line-height: 36px;
+  }
+
+  nav {
+    flex: 1 1 100%;
+    margin-left: 0;
+    gap: 4px;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-link,
+  nav button {
+    min-height: 36px;
+  }
+
+  main {
+    width: 100%;
+    padding: 20px max(16px, env(safe-area-inset-left))
+      max(24px, env(safe-area-inset-right));
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 19px;
+  }
+
+  .page-header .btn-add-sub,
+  .page-header .btn-send-msg {
+    flex: 1 1 100%;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .filter-tabs {
+    display: flex;
+    width: 100%;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-tab {
+    min-height: 36px;
+    padding: 7px 12px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-wrap table {
+    min-width: 820px;
+  }
+
+  thead th,
+  td {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .user-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .user-info-main {
+    min-width: 0;
+  }
+
+  .user-name {
+    overflow-wrap: anywhere;
+  }
+
+  .user-meta {
+    gap: 6px 12px;
+  }
+
+  .user-card .btn-vip {
+    flex: 1 1 100%;
+    width: 100%;
+    min-height: 38px;
+  }
+
+  .theatre-section {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .theatre-header {
+    min-width: 100%;
+    padding: 12px 16px;
+  }
+
+  .theatre-section > table {
+    min-width: 560px;
+  }
+
+  .accordion-header {
+    align-items: flex-start;
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  .accordion-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .scene-tag {
+    margin-left: 2px;
+  }
+
+  .add-sub-form {
+    align-items: stretch;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+  }
+
+  .add-sub-input {
+    flex: 1 1 160px;
+    width: auto;
+    min-height: 36px;
+  }
+
+  .add-sub-form .btn-subscribe {
+    min-height: 36px;
+  }
+
+  .add-sub-error {
+    flex: 1 1 100%;
+  }
+
+  .sub-table {
+    min-width: 620px;
+  }
+
+  .paid-sub-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .paid-sub-info {
+    min-width: 0;
+  }
+
+  .paid-sub-meta {
+    gap: 4px 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .paid-sub-actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+  }
+
+  .paid-sub-actions button,
+  .paid-sub-card > .btn-cancel-sub {
+    flex: 1 1 100%;
+    min-height: 38px;
+  }
+
+  .modal-overlay,
+  #modal-overlay,
+  #paid-modal-overlay {
+    align-items: flex-end;
+    padding: 8px max(8px, env(safe-area-inset-left))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom));
+  }
+
+  .modal {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-bottom));
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+
+  .modal-title,
+  .modal-subtitle {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .modal-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-tab {
+    min-height: 42px;
+    padding: 10px 12px;
+  }
+
+  .modal-table {
+    min-width: 600px;
+  }
+
+  .modal-body {
+    min-height: 0;
+  }
+
+  .paid-sub-form-body {
+    padding: 16px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .form-grid label:not(:first-child) {
+    margin-top: 6px;
+  }
+
+  .form-grid input[type="date"],
+  .form-grid input[type="number"],
+  .form-grid input[type="text"] {
+    min-height: 40px;
+  }
+
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .form-actions > * {
+    flex: 1 1 100%;
+    min-height: 40px;
+  }
+
+  .send-msg-textarea,
+  .send-msg-parse-mode {
+    font-size: 16px;
+  }
+
+  .login-form {
+    width: 100%;
+    max-width: none;
+    margin: 40px auto;
+  }
+}
